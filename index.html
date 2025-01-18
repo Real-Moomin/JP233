@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+        .player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #1e1e1e;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 10px 30px 10px 24px;
+            border-top: 1px solid #444;
+            height: 40px;
+            box-shadow: 0px 0px 16px black;
+        }
+        .player span {
+            margin: 0 10px;
+        }
+        #progress {
+            flex-grow: 1;
+            margin: 0 10px;
+        }
+        .playlist {
+            margin-bottom: 80px; /* Space for the player and volume slider */
+        }
+        .playlist-item {
+            padding: 24px 16px 24px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #222;
+        }
+        .playlist-item:hover {
+            background-color: #333;
+        }
+        .playlist-item.active {
+            background-color: #fff;
+            color: #000;
+        }
+        .volume-slider {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+        .volume-slider input {
+            margin-left: 10px;
+        }
+        .title{
+          padding: 16px;
+          line-height: 1.3;
+          font-size: 16px;
+        }
+        #file-name{font-size: 13px; color: #999;}
+        @media screen and (max-width: 640px) {
+          .volume-slider {
+              display: none;
+          }
+          .volume-slider input {
+display: none;
+          }
+           }
+    </style>
+</head>
+<body>
+    <div class="title"><h1>비즈니스<br>일본어회화<br>이메일 핵심패턴<br>233</h1></div>
+    <div class="playlist" id="playlist"></div>
+    <div class="player" id="player">
+        <button id="play-pause">▶</button>
+        <span id="current-time">0:00</span>
+        <input type="range" id="progress" min="0" max="100" value="0">
+        <span id="duration">0:00</span>
+        <span id="file-name"></span>
+        <div class="volume-slider">
+            <label for="volume">🔊</label>
+            <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+        </div>
+    </div>
+
+    <script>
+        const totalTracks = 233;
+        const playlistElement = document.getElementById('playlist');
+        const playerElement = document.getElementById('player');
+        const playPauseButton = document.getElementById('play-pause');
+        const currentTimeElement = document.getElementById('current-time');
+        const durationElement = document.getElementById('duration');
+        const fileNameElement = document.getElementById('file-name');
+        const progressBar = document.getElementById('progress');
+        const volumeSlider = document.getElementById('volume');
+
+        let audio = new Audio();
+        let currentTrackIndex = -1;
+
+        // Populate the playlist
+        for (let i = 1; i <= totalTracks; i++) {
+            const trackName = `${String(i).padStart(3, '0')}_H.mp3`;
+            const trackElement = document.createElement('div');
+            trackElement.className = 'playlist-item';
+            trackElement.textContent = trackName;
+            trackElement.dataset.index = i - 1;
+            trackElement.addEventListener('click', () => playTrack(i - 1));
+            playlistElement.appendChild(trackElement);
+        }
+
+        // Update the player UI
+        function updatePlayerUI() {
+            const trackElements = document.querySelectorAll('.playlist-item');
+            trackElements.forEach((el, index) => {
+                el.classList.toggle('active', index === currentTrackIndex);
+            });
+            if (currentTrackIndex >= 0) {
+                fileNameElement.textContent = `${String(currentTrackIndex + 1).padStart(3, '0')}_H.mp3`;
+            } else {
+                fileNameElement.textContent = 'No track selected';
+            }
+            currentTimeElement.textContent = formatTime(audio.currentTime);
+            if (!isNaN(audio.duration)) {
+                durationElement.textContent = formatTime(audio.duration);
+            } else {
+                durationElement.textContent = '0:00';
+            }
+        }
+
+        // Play a specific track
+        function playTrack(index) {
+            currentTrackIndex = index;
+            audio.src = `${String(index + 1).padStart(3, '0')}_H.mp3`;
+            audio.play();
+            playPauseButton.textContent = '⏸';
+            audio.addEventListener('loadedmetadata', updatePlayerUI);
+            updatePlayerUI();
+        }
+
+        // Format time in seconds to mm:ss
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // Event listeners
+        playPauseButton.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playPauseButton.textContent = '⏸';
+            } else {
+                audio.pause();
+                playPauseButton.textContent = '▶';
+            }
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            currentTimeElement.textContent = formatTime(audio.currentTime);
+            progressBar.value = (audio.currentTime / audio.duration) * 100;
+        });
+
+        audio.addEventListener('ended', () => {
+            if (currentTrackIndex < totalTracks - 1) {
+                playTrack(currentTrackIndex + 1);
+            } else {
+                audio.pause();
+                playPauseButton.textContent = '▶';
+            }
+        });
+
+        progressBar.addEventListener('input', () => {
+            audio.currentTime = (progressBar.value / 100) * audio.duration;
+        });
+
+        volumeSlider.addEventListener('input', () => {
+            audio.volume = volumeSlider.value;
+        });
+    </script>
+</body>
+</html>
