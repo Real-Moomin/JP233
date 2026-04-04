@@ -2,12 +2,9 @@ let sortedSets = [];
 let currentSet = null;
 
 const problemFiles = [
-  "./data/problem_001.json",
-  "./data/problem_002.json",
-  "./data/problem_003.json",
-  "./data/problem_004.json",
-  "./data/problem_005.json",
-  "./data/problem_006.json"
+  "./data/humanities.json",
+  "./data/science.json",
+  "./data/tech-social.json"
 ];
 
 const setListEl = document.getElementById("setList");
@@ -59,9 +56,9 @@ function renderPassage(paragraphs) {
 
 function renderSolutions(set) {
   solutionsEl.innerHTML = `
-    <p><strong>問題1 正答：${set.q1.answerText}</strong> — ${set.q1.explanation}</p>
-    <p><strong>問題2 正答：${set.q2.answerText}</strong> — ${set.q2.explanation}</p>
-    <p><strong>問題3 正答：${set.q3.answerText}</strong> — ${set.q3.explanation}</p>
+    <p><strong>문제1 정답: ${set.q1.answerText}</strong> — ${set.q1.explanation}</p>
+    <p><strong>문제2 정답: ${set.q2.answerText}</strong> — ${set.q2.explanation}</p>
+    <p><strong>문제3 정답: ${set.q3.answerText}</strong> — ${set.q3.explanation}</p>
   `;
 }
 
@@ -70,6 +67,10 @@ function render() {
 
   setTitleEl.textContent = currentSet.title;
   setMetaEl.textContent = `作成日: ${currentSet.createdAt} ・ 難易度: ${currentSet.level}`;
+
+  q1TitleEl.textContent = currentSet.q1.title;
+  q2TitleEl.textContent = currentSet.q2.title;
+  q3TitleEl.textContent = currentSet.q3.title;
 
   q1TitleEl.textContent = currentSet.q1.title;
   q2TitleEl.textContent = currentSet.q2.title;
@@ -106,8 +107,8 @@ async function initialize() {
     currentSet = sortedSets[0] || null;
     render();
   } catch (error) {
-    setTitleEl.textContent = "問題の読み込みに失敗しました。";
-    setMetaEl.textContent = "data/problem_*.json を確認してください。";
+    setTitleEl.textContent = "문제를 불러오지 못했습니다.";
+    setMetaEl.textContent = "data/*.json 파일을 확인해주세요.";
     console.error(error);
   }
 }
