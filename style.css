@@ -1,0 +1,144 @@
+:root {
+  --bg: #151515;
+  --bg-2: #1b1b1b;
+  --panel: #202020;
+  --panel-2: #262626;
+  --text: #f0f0f0;
+  --sub: #b6b6b6;
+  --border: #3a3a3a;
+  --focus: #8a8a8a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
+  background: linear-gradient(180deg, var(--bg), #111111);
+  color: var(--text);
+}
+
+.app-shell {
+  display: flex;
+  justify-content: center;
+}
+
+.app {
+  width: min(100%, 1600px);
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  border-right: 1px solid var(--border);
+  background: rgba(20, 20, 20, 0.9);
+  padding: 20px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.sidebar h1 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+}
+
+.sub {
+  margin: 0 0 16px;
+  color: var(--sub);
+  font-size: 0.9rem;
+}
+
+.set-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.set-btn {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.set-btn .date {
+  font-size: 0.8rem;
+  color: var(--sub);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.set-btn.active {
+  border-color: var(--focus);
+  background: var(--panel-2);
+  box-shadow: 0 0 0 1px var(--focus) inset;
+}
+
+.content {
+  padding: 26px;
+  display: grid;
+  gap: 16px;
+  max-width: 1080px;
+  width: 100%;
+}
+
+.content-head h2 { margin: 0; }
+.content-head p { margin: 6px 0 0; color: var(--sub); }
+
+.card {
+  background: rgba(31, 31, 31, 0.92);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.passage p {
+  line-height: 1.9;
+  margin: 0 0 14px;
+}
+
+.choices {
+  margin: 0;
+  padding-left: 24px;
+  line-height: 1.75;
+}
+
+.prompt { color: var(--sub); }
+
+.linked {
+  margin: 10px 0;
+  padding: 10px 14px;
+  border-left: 4px solid #707070;
+  color: #e4e4e4;
+  background: rgba(112, 112, 112, 0.16);
+  white-space: pre-line;
+}
+
+.answer strong { color: #d8d8d8; }
+.answer p { line-height: 1.7; }
+
+@media (max-width: 1000px) {
+  .app {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .set-list { max-height: 320px; }
+  .content { max-width: none; }
+}
