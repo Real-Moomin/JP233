@@ -1,14 +1,7 @@
 let sortedSets = [];
 let currentSet = null;
 
-const problemFiles = [
-  "./data/problem_001.json",
-  "./data/problem_002.json",
-  "./data/problem_003.json",
-  "./data/problem_004.json",
-  "./data/problem_005.json",
-  "./data/problem_006.json"
-];
+const manifestPath = "./data/problem-files.json";
 
 const setListEl = document.getElementById("setList");
 const setTitleEl = document.getElementById("setTitle");
@@ -59,9 +52,9 @@ function renderPassage(paragraphs) {
 
 function renderSolutions(set) {
   solutionsEl.innerHTML = `
-    <p><strong>問題1 正答：${set.q1.answerText}</strong> — ${set.q1.explanation}</p>
-    <p><strong>問題2 正答：${set.q2.answerText}</strong> — ${set.q2.explanation}</p>
-    <p><strong>問題3 正答：${set.q3.answerText}</strong> — ${set.q3.explanation}</p>
+    <p><strong>問題1 正答：${set.q1.answerText}</strong> - ${set.q1.explanation}</p>
+    <p><strong>問題2 正答：${set.q2.answerText}</strong> - ${set.q2.explanation}</p>
+    <p><strong>問題3 正答：${set.q3.answerText}</strong> - ${set.q3.explanation}</p>
   `;
 }
 
@@ -97,17 +90,41 @@ async function loadJson(path) {
   return response.json();
 }
 
+function getEmbeddedProblems() {
+  const embedded = window.__JP233_EMBEDDED_DATA__;
+  if (embedded && Array.isArray(embedded.problems)) {
+    return embedded.problems;
+  }
+  throw new Error("embedded problem data is unavailable");
+}
+
+async function loadProblemSets() {
+  try {
+    const manifest = await loadJson(manifestPath);
+    const files = Array.isArray(manifest.files) ? manifest.files : [];
+    const loadedProblems = await Promise.all(files.map(loadJson));
+    return loadedProblems;
+  } catch (error) {
+    console.warn("Falling back to embedded local data.", error);
+    return getEmbeddedProblems();
+  }
+}
+
 async function initialize() {
   try {
-    const loaded = await Promise.all(problemFiles.map(loadJson));
-    const problemSets = loaded.flatMap((item) => item.sets || []);
+    const problemSets = await loadProblemSets();
 
     sortedSets = [...problemSets].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     currentSet = sortedSets[0] || null;
+
+    if (!currentSet) {
+      throw new Error("No problem sets available");
+    }
+
     render();
   } catch (error) {
     setTitleEl.textContent = "問題の読み込みに失敗しました。";
-    setMetaEl.textContent = "data/problem_*.json を確認してください。";
+    setMetaEl.textContent = "data/problem-files.json と data/problems/*.json、または embedded-data.js を確認してください。";
     console.error(error);
   }
 }
