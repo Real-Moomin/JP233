@@ -63,6 +63,16 @@ body {
   padding-right: 4px;
 }
 
+
+.set-list {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.set-list::-webkit-scrollbar {
+  display: none;
+}
+
 .set-btn {
   width: 100%;
   text-align: left;
