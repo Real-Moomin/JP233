@@ -1,5 +1,4 @@
 :root {
-
   --bg: #151515;
   --bg-2: #1b1b1b;
   --panel: #202020;
@@ -10,15 +9,12 @@
   --focus: #8a8a8a;
   --accent: #6f8cff;
   --accent-2: #4aa878;
-
-
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-
   font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
   background: linear-gradient(180deg, var(--bg), #111111);
   color: var(--text);
@@ -33,18 +29,19 @@ body {
   width: min(100%, 1600px);
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
-
   min-height: 100vh;
 }
 
 .sidebar {
   border-right: 1px solid var(--border);
   background: rgba(20, 20, 20, 0.9);
-
   padding: 20px;
   position: sticky;
   top: 0;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .sidebar h1 {
@@ -62,7 +59,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .set-btn {
@@ -84,7 +82,6 @@ body {
 }
 
 .set-btn.active {
-
   border-color: var(--accent);
   background: var(--panel-2);
   box-shadow: 0 0 0 1px var(--accent) inset;
@@ -103,14 +100,12 @@ body {
 
 .card {
   background: rgba(31, 31, 31, 0.92);
-
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 18px;
 }
 
 .passage p {
-
   line-height: 1.85;
   margin: 0 0 12px;
 }
@@ -118,7 +113,6 @@ body {
 .choices {
   margin: 0;
   padding-left: 24px;
-
   line-height: 1.7;
 }
 
@@ -127,20 +121,9 @@ body {
 .linked {
   margin: 10px 0;
   padding: 10px 14px;
-
   border-left: 4px solid var(--accent-2);
   color: #dbffe9;
   background: rgba(74, 140, 111, 0.16);
-}
-
-textarea {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: #0f1328;
-  color: var(--text);
-  padding: 12px;
-  resize: vertical;
 }
 
 .answer strong { color: var(--accent-2); }
@@ -155,4 +138,7 @@ textarea {
     border-bottom: 1px solid var(--border);
   }
 
+  .set-list {
+    max-height: 300px;
+  }
 }
