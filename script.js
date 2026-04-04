@@ -183,7 +183,6 @@ const q3PromptEl = document.getElementById("q3Prompt");
 const q3LinkedEl = document.getElementById("q3Linked");
 const q3El = document.getElementById("q3");
 
-const q4PromptEl = document.getElementById("q4Prompt");
 const solutionsEl = document.getElementById("solutions");
 
 function renderChoices(target, choices) {
@@ -241,8 +240,6 @@ function render() {
   q3LinkedEl.textContent = currentSet.q3.linked;
   renderChoices(q3El, currentSet.q3.choices);
 
-
-  q4PromptEl.textContent = currentSet.q4.prompt;
   renderSolutions(currentSet);
   renderSetList();
 }
