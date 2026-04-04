@@ -66,7 +66,11 @@ function render() {
   if (!currentSet) return;
 
   setTitleEl.textContent = currentSet.title;
-  setMetaEl.textContent = `제작일: ${currentSet.createdAt} · 난이도: ${currentSet.level}`;
+  setMetaEl.textContent = `作成日: ${currentSet.createdAt} ・ 難易度: ${currentSet.level}`;
+
+  q1TitleEl.textContent = currentSet.q1.title;
+  q2TitleEl.textContent = currentSet.q2.title;
+  q3TitleEl.textContent = currentSet.q3.title;
 
   q1TitleEl.textContent = currentSet.q1.title;
   q2TitleEl.textContent = currentSet.q2.title;
