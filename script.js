@@ -182,6 +182,8 @@ const q2El = document.getElementById("q2");
 const q3PromptEl = document.getElementById("q3Prompt");
 const q3LinkedEl = document.getElementById("q3Linked");
 const q3El = document.getElementById("q3");
+
+const q4PromptEl = document.getElementById("q4Prompt");
 const solutionsEl = document.getElementById("solutions");
 
 function renderChoices(target, choices) {
@@ -226,7 +228,8 @@ function renderSolutions(set) {
 
 function render() {
   setTitleEl.textContent = currentSet.title;
-  setMetaEl.textContent = `作成日: ${currentSet.createdAt} ・ 難易度: ${currentSet.level}`;
+
+  setMetaEl.textContent = `제작일: ${currentSet.createdAt} · 난이도: ${currentSet.level}`;
 
   renderPassage(currentSet.passage);
   renderChoices(q1El, currentSet.q1.choices);
@@ -238,6 +241,8 @@ function render() {
   q3LinkedEl.textContent = currentSet.q3.linked;
   renderChoices(q3El, currentSet.q3.choices);
 
+
+  q4PromptEl.textContent = currentSet.q4.prompt;
   renderSolutions(currentSet);
   renderSetList();
 }
