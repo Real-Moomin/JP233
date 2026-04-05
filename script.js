@@ -2,6 +2,7 @@ let sortedSets = [];
 let currentSet = null;
 
 const manifestPath = "./data/problem-files.json";
+const storageKey = "jp233-progress-v1";
 
 const setListEl = document.getElementById("setList");
 const setTitleEl = document.getElementById("setTitle");
@@ -10,12 +11,88 @@ const passageEl = document.getElementById("passage");
 const questionCardsEl = document.getElementById("questionCards");
 const solutionsEl = document.getElementById("solutions");
 const questionKeys = ["q1", "q2", "q3", "q4", "q5"];
+let progress = loadProgress();
 
-function renderChoices(target, choices) {
+function loadProgress() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(storageKey) || "{}");
+    return {
+      answers: parsed.answers || {},
+      viewed: parsed.viewed || {},
+      solutionOpen: parsed.solutionOpen || {}
+    };
+  } catch (error) {
+    console.warn("Failed to load saved progress.", error);
+    return { answers: {}, viewed: {}, solutionOpen: {} };
+  }
+}
+
+function saveProgress() {
+  window.localStorage.setItem(storageKey, JSON.stringify(progress));
+}
+
+function getSavedAnswer(problemId, key) {
+  return progress.answers[problemId]?.[key] || null;
+}
+
+function setSavedAnswer(problemId, key, answerText) {
+  if (!progress.answers[problemId]) {
+    progress.answers[problemId] = {};
+  }
+  progress.answers[problemId][key] = answerText;
+  saveProgress();
+}
+
+function markViewed(problemId) {
+  if (!progress.viewed[problemId]) {
+    progress.viewed[problemId] = true;
+    saveProgress();
+  }
+}
+
+function isCompleted(set) {
+  return questionKeys.every((key) => set[key] && getSavedAnswer(set.id, key));
+}
+
+function isSolutionOpen(problemId) {
+  return Boolean(progress.solutionOpen[problemId]);
+}
+
+function setSolutionOpen(problemId, open) {
+  progress.solutionOpen[problemId] = open;
+  saveProgress();
+}
+
+function renderChoices(target, set, key, choices) {
   target.innerHTML = "";
-  choices.forEach((choice) => {
+  const selectedAnswer = getSavedAnswer(set.id, key);
+  const solutionOpen = isSolutionOpen(set.id);
+  const correctAnswer = set[key].answerText;
+
+  choices.forEach((choice, index) => {
     const li = document.createElement("li");
-    li.textContent = choice;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "choice-btn";
+    button.textContent = choice;
+
+    const answerNumber = String(index + 1);
+    if (selectedAnswer === answerNumber) {
+      button.classList.add("selected");
+    }
+    if (solutionOpen && correctAnswer === answerNumber) {
+      button.classList.add("correct");
+    }
+    if (solutionOpen && selectedAnswer === answerNumber && correctAnswer !== answerNumber) {
+      button.classList.add("wrong");
+    }
+
+    button.addEventListener("click", () => {
+      setSavedAnswer(set.id, key, answerNumber);
+      render();
+    });
+
+    li.appendChild(button);
     target.appendChild(li);
   });
 }
@@ -24,8 +101,18 @@ function renderSetList() {
   setListEl.innerHTML = "";
   sortedSets.forEach((set) => {
     const btn = document.createElement("button");
-    btn.className = `set-btn ${set.id === currentSet.id ? "active" : ""}`;
-    btn.innerHTML = `<span class="date">${set.createdAt}</span>${set.title}`;
+    const read = Boolean(progress.viewed[set.id]);
+    const completed = isCompleted(set);
+    const status = completed ? "完了" : read ? "既読" : "";
+
+    btn.className = `set-btn ${set.id === currentSet.id ? "active" : ""} ${read ? "read" : ""} ${completed ? "completed" : ""}`;
+    btn.innerHTML = `
+      <span class="meta-row">
+        <span class="date">${set.createdAt}</span>
+        <span class="state">${status}</span>
+      </span>
+      ${set.title}
+    `;
     btn.addEventListener("click", () => {
       currentSet = set;
       render();
@@ -73,7 +160,7 @@ function renderQuestions(set) {
 
     const choices = document.createElement("ol");
     choices.className = "choices";
-    renderChoices(choices, question.choices);
+    renderChoices(choices, set, key, question.choices);
     section.appendChild(choices);
 
     questionCardsEl.appendChild(section);
@@ -82,28 +169,49 @@ function renderQuestions(set) {
 
 function renderSolutions(set) {
   solutionsEl.innerHTML = "";
+  const details = document.createElement("details");
+  details.className = "solution-panel";
+  details.open = isSolutionOpen(set.id);
+  details.addEventListener("toggle", () => {
+    setSolutionOpen(set.id, details.open);
+    render();
+  });
+
+  const summary = document.createElement("summary");
+  summary.textContent = "解答・解説を開く";
+  details.appendChild(summary);
+
+  const body = document.createElement("div");
+  body.className = "solution-body";
 
   questionKeys.forEach((key) => {
     const question = set[key];
     if (!question) return;
 
-    const details = document.createElement("details");
-    details.className = "solution-item";
+    const block = document.createElement("div");
+    block.className = "solution-block";
 
-    const summary = document.createElement("summary");
-    summary.textContent = `${question.title.split(".")[0]} 正答：${question.answerText}`;
-    details.appendChild(summary);
+    const title = document.createElement("p");
+    title.className = "solution-title";
+    const selectedAnswer = getSavedAnswer(set.id, key) || "未選択";
+    title.textContent = `${question.title.split(".")[0]} 正答：${question.answerText} / あなたの選択：${selectedAnswer}`;
 
     const explanation = document.createElement("p");
+    explanation.className = "solution-text";
     explanation.textContent = question.explanation;
-    details.appendChild(explanation);
 
-    solutionsEl.appendChild(details);
+    block.appendChild(title);
+    block.appendChild(explanation);
+    body.appendChild(block);
   });
+
+  details.appendChild(body);
+  solutionsEl.appendChild(details);
 }
 
 function render() {
   if (!currentSet) return;
+  markViewed(currentSet.id);
 
   setTitleEl.textContent = currentSet.title;
   setMetaEl.textContent = `作成日: ${currentSet.createdAt} ・ 難易度: ${currentSet.level}`;
