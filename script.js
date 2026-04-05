@@ -189,7 +189,6 @@ function renderSolutions(set) {
   details.open = isSolutionOpen(set.id);
   details.addEventListener("toggle", () => {
     setSolutionOpen(set.id, details.open);
-    render();
   });
 
   const summary = document.createElement("summary");
