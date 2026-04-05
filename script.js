@@ -1,5 +1,5 @@
 let sortedSets = [];
-let currentSet = null;
+let currentSetId = null;
 
 const manifestPath = "./data/problem-files.json";
 const storageKey = "jp233-progress-v1";
@@ -43,6 +43,15 @@ function setSavedAnswer(problemId, key, answerText) {
   saveProgress();
 }
 
+function clearSavedAnswer(problemId, key) {
+  if (!progress.answers[problemId]) return;
+  delete progress.answers[problemId][key];
+  if (Object.keys(progress.answers[problemId]).length === 0) {
+    delete progress.answers[problemId];
+  }
+  saveProgress();
+}
+
 function markViewed(problemId) {
   if (!progress.viewed[problemId]) {
     progress.viewed[problemId] = true;
@@ -52,6 +61,10 @@ function markViewed(problemId) {
 
 function isCompleted(set) {
   return questionKeys.every((key) => set[key] && getSavedAnswer(set.id, key));
+}
+
+function getCurrentSet() {
+  return sortedSets.find((set) => set.id === currentSetId) || null;
 }
 
 function isSolutionOpen(problemId) {
@@ -66,8 +79,6 @@ function setSolutionOpen(problemId, open) {
 function renderChoices(target, set, key, choices) {
   target.innerHTML = "";
   const selectedAnswer = getSavedAnswer(set.id, key);
-  const solutionOpen = isSolutionOpen(set.id);
-  const correctAnswer = set[key].answerText;
 
   choices.forEach((choice, index) => {
     const li = document.createElement("li");
@@ -80,15 +91,13 @@ function renderChoices(target, set, key, choices) {
     if (selectedAnswer === answerNumber) {
       button.classList.add("selected");
     }
-    if (solutionOpen && correctAnswer === answerNumber) {
-      button.classList.add("correct");
-    }
-    if (solutionOpen && selectedAnswer === answerNumber && correctAnswer !== answerNumber) {
-      button.classList.add("wrong");
-    }
 
     button.addEventListener("click", () => {
-      setSavedAnswer(set.id, key, answerNumber);
+      if (selectedAnswer === answerNumber) {
+        clearSavedAnswer(set.id, key);
+      } else {
+        setSavedAnswer(set.id, key, answerNumber);
+      }
       render();
     });
 
@@ -101,25 +110,31 @@ function renderSetList() {
   setListEl.innerHTML = "";
   sortedSets.forEach((set) => {
     const btn = document.createElement("button");
-    const read = Boolean(progress.viewed[set.id]);
-    const completed = isCompleted(set);
-    const status = completed ? "完了" : read ? "既読" : "";
+    btn.type = "button";
+    btn.dataset.setId = set.id;
+    const read = isCompleted(set);
+    const status = read ? "既読" : "";
 
-    btn.className = `set-btn ${set.id === currentSet.id ? "active" : ""} ${read ? "read" : ""} ${completed ? "completed" : ""}`;
+    btn.className = `set-btn ${set.id === currentSetId ? "active" : ""} ${read ? "read completed" : ""}`;
     btn.innerHTML = `
       <span class="meta-row">
         <span class="date">${set.createdAt}</span>
         <span class="state">${status}</span>
       </span>
-      ${set.title}
+      <span class="title-text">${set.title}</span>
     `;
-    btn.addEventListener("click", () => {
-      currentSet = set;
-      render();
-    });
     setListEl.appendChild(btn);
   });
 }
+
+setListEl.addEventListener("click", (event) => {
+  const button = event.target.closest(".set-btn");
+  if (!button) return;
+  const { setId } = button.dataset;
+  if (!setId || setId === currentSetId) return;
+  currentSetId = setId;
+  render();
+});
 
 function renderPassage(paragraphs) {
   passageEl.innerHTML = "";
@@ -210,8 +225,8 @@ function renderSolutions(set) {
 }
 
 function render() {
+  const currentSet = getCurrentSet();
   if (!currentSet) return;
-  markViewed(currentSet.id);
 
   setTitleEl.textContent = currentSet.title;
   setMetaEl.textContent = `作成日: ${currentSet.createdAt} ・ 難易度: ${currentSet.level}`;
@@ -255,9 +270,11 @@ async function initialize() {
     const problemSets = await loadProblemSets();
 
     sortedSets = [...problemSets].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    currentSet = sortedSets[0] || null;
+    if (!currentSetId || !sortedSets.some((set) => set.id === currentSetId)) {
+      currentSetId = sortedSets[0]?.id || null;
+    }
 
-    if (!currentSet) {
+    if (!currentSetId) {
       throw new Error("No problem sets available");
     }
 
