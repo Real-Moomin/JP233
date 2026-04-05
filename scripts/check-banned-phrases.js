@@ -6,6 +6,7 @@ const problemsDir = path.join(root, "data", "problems");
 const bannedPhrases = ["本文は", "本文では"];
 const fieldsToCheck = ["title", "prompt", "linked", "explanation"];
 const questionKeys = ["q1", "q2", "q3", "q4", "q5"];
+const quotedWordPattern = /「([^」]+)」/;
 
 const hits = [];
 
@@ -37,14 +38,20 @@ for (const name of fs.readdirSync(problemsDir).filter((file) => file.endsWith(".
       }
     }
   }
+
+  const q2Word = data.q2?.title?.match(quotedWordPattern)?.[1] || null;
+  const q5Word = data.q5?.title?.match(quotedWordPattern)?.[1] || null;
+  if (q2Word && q5Word && q2Word === q5Word) {
+    hits.push(`${name} q2/q5 target overlap: ${q2Word}`);
+  }
 }
 
 if (hits.length > 0) {
-  console.error("Banned phrase check failed:");
+  console.error("Reading problem validation failed:");
   for (const hit of hits) {
     console.error(`- ${hit}`);
   }
   process.exit(1);
 }
 
-console.log("No banned phrases found in data/problems.");
+console.log("No banned phrases or q2/q5 target overlaps found in data/problems.");
