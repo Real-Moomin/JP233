@@ -1,29 +1,9 @@
 {
   "files": [
-    "./data/problems/problem-021.json",
-    "./data/problems/problem-022.json",
-    "./data/problems/problem-023.json",
-    "./data/problems/problem-024.json",
-    "./data/problems/problem-025.json",
-    "./data/problems/problem-015.json",
-    "./data/problems/problem-016.json",
-    "./data/problems/problem-017.json",
-    "./data/problems/problem-018.json",
-    "./data/problems/problem-019.json",
-    "./data/problems/problem-020.json",
     "./data/problems/problem-001.json",
     "./data/problems/problem-002.json",
     "./data/problems/problem-003.json",
     "./data/problems/problem-004.json",
-    "./data/problems/problem-005.json",
-    "./data/problems/problem-006.json",
-    "./data/problems/problem-007.json",
-    "./data/problems/problem-008.json",
-    "./data/problems/problem-009.json",
-    "./data/problems/problem-010.json",
-    "./data/problems/problem-011.json",
-    "./data/problems/problem-012.json",
-    "./data/problems/problem-013.json",
-    "./data/problems/problem-014.json"
+    "./data/problems/problem-005.json"
   ]
 }

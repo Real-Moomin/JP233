@@ -91,6 +91,11 @@ body {
   align-items: center;
 }
 
+.set-btn .title-text {
+  display: block;
+  line-height: 1.5;
+}
+
 .set-btn .date {
   font-size: 0.8rem;
   color: var(--sub);
@@ -172,16 +177,6 @@ body {
 .choice-btn.selected {
   border-color: var(--accent);
   background: rgba(111, 140, 255, 0.14);
-}
-
-.choice-btn.correct {
-  border-color: var(--accent-2);
-  background: rgba(74, 168, 120, 0.18);
-}
-
-.choice-btn.wrong {
-  border-color: #d36d6d;
-  background: rgba(170, 74, 74, 0.16);
 }
 
 .prompt { color: var(--sub); }
