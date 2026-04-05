@@ -108,6 +108,11 @@ body {
 .content-head h2 { margin: 0; }
 .content-head p { margin: 6px 0 0; color: var(--sub); }
 
+.question-cards {
+  display: grid;
+  gap: 16px;
+}
+
 .card {
   background: rgba(31, 31, 31, 0.92);
   border: 1px solid var(--border);
@@ -138,6 +143,43 @@ body {
 
 .answer strong { color: var(--accent-2); }
 .answer p { line-height: 1.7; }
+
+.solution-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(22, 22, 22, 0.72);
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.solution-item summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 16px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+
+.solution-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.solution-item summary::after {
+  content: "開く";
+  float: right;
+  color: var(--sub);
+  font-weight: 500;
+}
+
+.solution-item[open] summary::after {
+  content: "閉じる";
+}
+
+.solution-item p {
+  margin: 0;
+  padding: 0 16px 16px;
+  color: var(--text);
+}
 
 @media (max-width: 900px) {
   .app { grid-template-columns: 1fr; }
