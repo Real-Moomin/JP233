@@ -7,16 +7,9 @@ const setListEl = document.getElementById("setList");
 const setTitleEl = document.getElementById("setTitle");
 const setMetaEl = document.getElementById("setMeta");
 const passageEl = document.getElementById("passage");
-const q1TitleEl = document.getElementById("q1Title");
-const q1El = document.getElementById("q1");
-const q2TitleEl = document.getElementById("q2Title");
-const q2PromptEl = document.getElementById("q2Prompt");
-const q2El = document.getElementById("q2");
-const q3TitleEl = document.getElementById("q3Title");
-const q3PromptEl = document.getElementById("q3Prompt");
-const q3LinkedEl = document.getElementById("q3Linked");
-const q3El = document.getElementById("q3");
+const questionCardsEl = document.getElementById("questionCards");
 const solutionsEl = document.getElementById("solutions");
+const questionKeys = ["q1", "q2", "q3", "q4", "q5"];
 
 function renderChoices(target, choices) {
   target.innerHTML = "";
@@ -50,12 +43,63 @@ function renderPassage(paragraphs) {
   });
 }
 
+function renderQuestions(set) {
+  questionCardsEl.innerHTML = "";
+
+  questionKeys.forEach((key) => {
+    const question = set[key];
+    if (!question) return;
+
+    const section = document.createElement("section");
+    section.className = "card";
+
+    const title = document.createElement("h3");
+    title.textContent = question.title;
+    section.appendChild(title);
+
+    if (question.prompt) {
+      const prompt = document.createElement("p");
+      prompt.className = "prompt";
+      prompt.textContent = question.prompt;
+      section.appendChild(prompt);
+    }
+
+    if (question.linked) {
+      const linked = document.createElement("blockquote");
+      linked.className = "linked";
+      linked.textContent = question.linked;
+      section.appendChild(linked);
+    }
+
+    const choices = document.createElement("ol");
+    choices.className = "choices";
+    renderChoices(choices, question.choices);
+    section.appendChild(choices);
+
+    questionCardsEl.appendChild(section);
+  });
+}
+
 function renderSolutions(set) {
-  solutionsEl.innerHTML = `
-    <p><strong>問題1 正答：${set.q1.answerText}</strong> - ${set.q1.explanation}</p>
-    <p><strong>問題2 正答：${set.q2.answerText}</strong> - ${set.q2.explanation}</p>
-    <p><strong>問題3 正答：${set.q3.answerText}</strong> - ${set.q3.explanation}</p>
-  `;
+  solutionsEl.innerHTML = "";
+
+  questionKeys.forEach((key) => {
+    const question = set[key];
+    if (!question) return;
+
+    const details = document.createElement("details");
+    details.className = "solution-item";
+
+    const summary = document.createElement("summary");
+    summary.textContent = `${question.title.split(".")[0]} 正答：${question.answerText}`;
+    details.appendChild(summary);
+
+    const explanation = document.createElement("p");
+    explanation.textContent = question.explanation;
+    details.appendChild(explanation);
+
+    solutionsEl.appendChild(details);
+  });
 }
 
 function render() {
@@ -64,20 +108,8 @@ function render() {
   setTitleEl.textContent = currentSet.title;
   setMetaEl.textContent = `作成日: ${currentSet.createdAt} ・ 難易度: ${currentSet.level}`;
 
-  q1TitleEl.textContent = currentSet.q1.title;
-  q2TitleEl.textContent = currentSet.q2.title;
-  q3TitleEl.textContent = currentSet.q3.title;
-
   renderPassage(currentSet.passage);
-  renderChoices(q1El, currentSet.q1.choices);
-
-  q2PromptEl.textContent = currentSet.q2.prompt;
-  renderChoices(q2El, currentSet.q2.choices);
-
-  q3PromptEl.textContent = currentSet.q3.prompt;
-  q3LinkedEl.textContent = currentSet.q3.linked;
-  renderChoices(q3El, currentSet.q3.choices);
-
+  renderQuestions(currentSet);
   renderSolutions(currentSet);
   renderSetList();
 }
