@@ -10,8 +10,13 @@ const setMetaEl = document.getElementById("setMeta");
 const passageEl = document.getElementById("passage");
 const questionCardsEl = document.getElementById("questionCards");
 const solutionsEl = document.getElementById("solutions");
-const questionKeys = ["q1", "q2", "q3", "q4", "q5"];
 let progress = loadProgress();
+
+function getQuestionKeys(set) {
+  return Object.keys(set)
+    .filter((key) => /^q\d+$/.test(key))
+    .sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)));
+}
 
 function loadProgress() {
   try {
@@ -60,7 +65,7 @@ function markViewed(problemId) {
 }
 
 function isCompleted(set) {
-  return questionKeys.every((key) => set[key] && getSavedAnswer(set.id, key));
+  return getQuestionKeys(set).every((key) => getSavedAnswer(set.id, key));
 }
 
 function getCurrentSet() {
@@ -148,9 +153,8 @@ function renderPassage(paragraphs) {
 function renderQuestions(set) {
   questionCardsEl.innerHTML = "";
 
-  questionKeys.forEach((key) => {
+  getQuestionKeys(set).forEach((key) => {
     const question = set[key];
-    if (!question) return;
 
     const section = document.createElement("section");
     section.className = "card";
@@ -198,9 +202,8 @@ function renderSolutions(set) {
   const body = document.createElement("div");
   body.className = "solution-body";
 
-  questionKeys.forEach((key) => {
+  getQuestionKeys(set).forEach((key) => {
     const question = set[key];
-    if (!question) return;
 
     const block = document.createElement("div");
     block.className = "solution-block";

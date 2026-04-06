@@ -4,9 +4,6 @@
     "./data/problems/problem-002.json",
     "./data/problems/problem-003.json",
     "./data/problems/problem-004.json",
-    "./data/problems/problem-005.json",
-    "./data/problems/problem-006.json",
-    "./data/problems/problem-007.json",
-    "./data/problems/problem-008.json"
+    "./data/problems/problem-005.json"
   ]
 }
