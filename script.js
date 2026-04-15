@@ -12,6 +12,29 @@ const questionCardsEl = document.getElementById("questionCards");
 const solutionsEl = document.getElementById("solutions");
 let progress = loadProgress();
 
+function getDisplayOrderMap(sets) {
+  return new Map(
+    [...sets]
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      .map((set, index) => [set.id, index + 1])
+  );
+}
+
+function getDifficultyStars(set) {
+  const tier = set.difficultyTier || "";
+  const level = set.level || "";
+
+  if (tier === "upper-intermediate") return "★★★☆☆";
+  if (tier === "advanced") return "★★★★☆";
+  if (tier === "very advanced") return "★★★★★";
+
+  if (!level) return "★★★☆☆";
+  if (level.includes("N1") || level.includes("大学入試")) return "★★★★☆";
+  if (level.includes("N2")) return "★★★☆☆";
+  if (level.includes("N3")) return "★★☆☆☆";
+  return "★★★☆☆";
+}
+
 function getQuestionKeys(set) {
   return Object.keys(set)
     .filter((key) => /^q\d+$/.test(key))
@@ -158,17 +181,19 @@ function renderChoices(target, set, key, choices) {
 
 function renderSetList() {
   setListEl.innerHTML = "";
+  const displayOrderMap = getDisplayOrderMap(sortedSets);
   sortedSets.forEach((set) => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.dataset.setId = set.id;
     const read = isCompleted(set);
     const status = read ? "既読" : "";
+    const displayNumber = displayOrderMap.get(set.id);
 
     btn.className = `set-btn ${set.id === currentSetId ? "active" : ""} ${read ? "read completed" : ""}`;
     btn.innerHTML = `
       <span class="meta-row">
-        <span class="date">${set.createdAt}</span>
+        <span class="set-number">#${displayNumber}</span>
         <span class="state">${status}</span>
       </span>
       <span class="title-text">${set.title}</span>
@@ -276,9 +301,12 @@ function renderSolutions(set) {
 function render() {
   const currentSet = getCurrentSet();
   if (!currentSet) return;
+  const displayOrderMap = getDisplayOrderMap(sortedSets);
+  const displayNumber = displayOrderMap.get(currentSet.id);
+  const difficultyStars = getDifficultyStars(currentSet);
 
   setTitleEl.textContent = currentSet.title;
-  setMetaEl.textContent = `作成日: ${currentSet.createdAt} ・ 難易度: ${currentSet.level}`;
+  setMetaEl.textContent = `#${displayNumber} ・ 難易度: ${difficultyStars}`;
 
   renderPassage(currentSet);
   renderQuestions(currentSet);
