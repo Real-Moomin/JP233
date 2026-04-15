@@ -151,6 +151,14 @@ body {
   margin: 0 0 12px;
 }
 
+.passage-highlight {
+  color: #ffb15c;
+  background: rgba(255, 149, 0, 0.16);
+  padding: 0 0.12em;
+  border-radius: 0.22em;
+  font-weight: 700;
+}
+
 .choices {
   margin: 0;
   padding-left: 24px;
