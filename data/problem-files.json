@@ -9,6 +9,11 @@
     "./data/problems/problem-007.json",
     "./data/problems/problem-008.json",
     "./data/problems/problem-009.json",
-    "./data/problems/problem-010.json"
+    "./data/problems/problem-010.json",
+    "./data/problems/problem-011.json",
+    "./data/problems/problem-012.json",
+    "./data/problems/problem-013.json",
+    "./data/problems/problem-014.json",
+    "./data/problems/problem-015.json"
   ]
 }
