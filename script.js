@@ -81,6 +81,51 @@ function setSolutionOpen(problemId, open) {
   saveProgress();
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getQuotedTarget(title) {
+  const match = title.match(/「(.+?)」/);
+  return match ? match[1] : null;
+}
+
+function getHighlightTerms(set) {
+  return ["q2", "q4"]
+    .map((key) => set[key]?.title)
+    .filter(Boolean)
+    .map(getQuotedTarget)
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+}
+
+function buildHighlightedFragment(text, terms) {
+  const fragment = document.createDocumentFragment();
+  if (!terms.length) {
+    fragment.appendChild(document.createTextNode(text));
+    return fragment;
+  }
+
+  const pattern = new RegExp(`(${terms.map(escapeRegExp).join("|")})`, "g");
+  const parts = text.split(pattern);
+
+  parts.forEach((part) => {
+    if (!part) return;
+
+    if (terms.includes(part)) {
+      const mark = document.createElement("mark");
+      mark.className = "passage-highlight";
+      mark.textContent = part;
+      fragment.appendChild(mark);
+      return;
+    }
+
+    fragment.appendChild(document.createTextNode(part));
+  });
+
+  return fragment;
+}
+
 function renderChoices(target, set, key, choices) {
   target.innerHTML = "";
   const selectedAnswer = getSavedAnswer(set.id, key);
@@ -141,11 +186,13 @@ setListEl.addEventListener("click", (event) => {
   render();
 });
 
-function renderPassage(paragraphs) {
+function renderPassage(set) {
   passageEl.innerHTML = "";
-  paragraphs.forEach((text) => {
+  const terms = getHighlightTerms(set);
+
+  set.passage.forEach((text) => {
     const p = document.createElement("p");
-    p.textContent = text;
+    p.appendChild(buildHighlightedFragment(text, terms));
     passageEl.appendChild(p);
   });
 }
@@ -233,7 +280,7 @@ function render() {
   setTitleEl.textContent = currentSet.title;
   setMetaEl.textContent = `作成日: ${currentSet.createdAt} ・ 難易度: ${currentSet.level}`;
 
-  renderPassage(currentSet.passage);
+  renderPassage(currentSet);
   renderQuestions(currentSet);
   renderSolutions(currentSet);
   renderSetList();
